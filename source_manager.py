@@ -18,11 +18,4 @@ def find_all_enabled():
         all_sources = source_svc.find_all_enabled()
     return all_sources
 
-#add_source(['http://www.folha.uol.com.br'])
-
-# Main
-# ==============================================================================
-
-#if (__name__ == '__main__'):
-#    all = find_all_enabled()
-#    print(all)
+#add_source(['https://www.folha.uol.com.br', 'https://www.estadao.com.br/'])

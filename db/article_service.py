@@ -3,6 +3,7 @@
 from .base_service import BaseService
 from db.tables.tb_definitions import *
 from datetime import date
+from utils import hash_url
 
 class ArticleService(BaseService):
     """
@@ -20,11 +21,11 @@ class ArticleService(BaseService):
         Args:
             article_map: a dictionary with the data for persisting articles
         """
-        hashed_uri = hash(article_map['uri'])
+        hashed_url = hash_url(article_map['url'])
 
         article = TableArticles( \
-            uri=article_map['uri'],
-            hashed_uri=hashed_uri,
+            url=article_map['url'],
+            hashed_url=hashed_url,
             content=article_map['content'],
             published_time=article_map['published_time'],
             source_id=article_map['source_id'],
@@ -51,7 +52,7 @@ class ArticleService(BaseService):
         Args:
             a_url: a news article URL
         """
-        hashed_uri = hash(a_url)
+        hashed_url = hash_url(a_url)
         result = self._session.query(TableArticles) \
-                           .filter(TableArticles.hashed_uri == hashed_uri).all()
+                           .filter(TableArticles.hashed_url == hashed_url).all()
         return True if result else False

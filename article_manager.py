@@ -3,6 +3,7 @@
 import json
 from db.article_service import ArticleService
 from newspaper import Article
+from app.relevance_classifiers import RelevanceClassifier
 
 def is_url_in_db(a_url):
     """
@@ -41,7 +42,7 @@ def wrap_as_map(article3k, source_id):
     meta_data = article3k.meta_data
 
     article_map = {}
-    article_map['uri'] = article3k.url
+    article_map['url'] = article3k.url
     article_map['content'] = article3k.text
 
     section, published_time = None, None
@@ -72,8 +73,7 @@ def wrap_as_map(article3k, source_id):
     article_map['site_name'] = site_name
     article_map['source_id'] = source_id
     article_map['keywords'] = meta_data['keywords']
-
-    return json.dumps(article_map, sort_keys=True, indent=4)
+    return article_map
 
 def wrap_as_json(article3k, source_id):
     """
@@ -85,16 +85,22 @@ def wrap_as_json(article3k, source_id):
     article_map = wrap_as_map(article3k, source_id)
     return json.dumps(article_map, sort_keys=True, indent=4)
 
-def get_article3k(url):
+def download_n_parse(url):
     """
     Gets the article's metadata
     Args:
         url: The article's URL
     """
     article = Article(url)
-    article.download()
-    article.parse()
+    try:
+        article.download()
+        article.parse()
+    except Exception:
+        print("Could not download and parse:")
+        print(url)
+        return None
     return article
+
 
 def get_metadata(url, source_id):
     """
@@ -102,5 +108,5 @@ def get_metadata(url, source_id):
     Args:
         url: The article's URL
     """
-    article3k = get_article3k(url)
+    article3k = download_n_parse(url)
     return wrap_as_json(article3k, source_id)
