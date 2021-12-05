@@ -5,12 +5,20 @@ from sqlalchemy.orm import relationship
 
 Base = declarative_base()
 
+class TableURL(Base):
+    __tablename__ = "tb_urls"
+    __table_args__ = (UniqueConstraint('hashed_url', name="urlx_2"),)
+    id = Column('id', Integer, primary_key=True)
+    hashed_url = Column('hashed_url', BigInteger, nullable=False)
+    url = Column('url', Text(2048), nullable=False)
+    added = Column('added', Date, nullable=False)
+
 class TableArticles(Base):
     __tablename__ = "tb_articles"
-    __table_args__ = (UniqueConstraint('hashed_uri', name="urix_1"),)
+    __table_args__ = (UniqueConstraint('hashed_url', name="urlx_1"),)
     id = Column('id', Integer, primary_key=True)
-    hashed_uri = Column('hashed_uri', BigInteger, nullable=False)
-    uri = Column('uri', Text(2048), nullable=False)
+    hashed_url = Column('hashed_url', BigInteger, nullable=False)
+    url = Column('url', Text(2048), nullable=False)
     content = Column('content', Text(30000), nullable=False)
     published_time = Column('published_time', Date)
     source_id = Column('source_id', Integer, ForeignKey('tb_sources.id'), nullable=False)
