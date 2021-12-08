@@ -1,28 +1,36 @@
 # -*- coding: UTF-8 -*-
-import config
-import newspaper
+from app.relevance_classifiers import RelevanceClassifier
+import argparse
 import article_manager
+from config import scrapper_cfg, scrapper_logger
+import newspaper
 import source_manager
 import url_manager
-from app.relevance_classifiers import RelevanceClassifier
+from utils import hash_url
+from tqdm import tqdm
+from zmb_exceptions import ZmbNewsException
 
-def wrap_unseen_url(url, source_id):
+def scrape_all_sources_n_save():
     """
-    For unseen URLs, it downloads and parses an article and wraps the result as a JSON
+    Scrapes published news for all enabled sources in the database
+    """
+    success = True
+    for source_map in tqdm(source_manager.find_all_enabled()):
+        success = success and scrape_source_n_save(source_map)
+    return success
+
+def scrape_source_n_save(source_map):
+    """
+    Scrapes a source for published articles and adds them to the articles' table
     Args:
-        url: the URL of the article
-        source_id: the id of the source in the database
+        source_map: A map in the following format:
+                    {'id': 1, 'home_url': 'http://www.folha.uol.com.br'}
     """
-    article_map = None
-    if (not url_manager.has_url_been_seen(url)):
-        # Add to a cache in the database to avoid reprocessing
-        url_manager.add_url(url)
-
-        # Download and parse URL
-        article3k = article_manager.download_n_parse(url)
-        if (article3k):
-            article_map = article_manager.wrap_as_map(article3k, source_id)
-    return article_map
+    article_maps = wrap_source(source_map)
+    if (article_maps):
+        article_manager.add_all_articles(article_maps)
+        return True
+    return False
 
 def scrape_url_n_save(url, source_id):
     """
@@ -31,12 +39,41 @@ def scrape_url_n_save(url, source_id):
         url: the URL of the article
         source_id: the id of the source in the database
     """
-    article_map = wrap_unseen_url(url, source_id)
-    if (article_map):
-        if (RelevanceClassifier.is_relevant(article_map['content'])):
-            article_manager.add_article(article_map)
-            return True
+    # Remove attributes of the URL
+    # Raises an exception if the cleaning goes wrong
+    cleaned_url = url_manager.clean_url(url)
+
+    article_map = wrap_unseen_url(cleaned_url, source_id)
+    if (article_map and is_relevant(article_map)):
+        article_manager.add_article(article_map)
+        return True
     return False
+
+# Helper functions
+# ==============================================================================
+
+def wrap_unseen_url(url, source_id):
+    """
+    For unseen CLEANED URLs, it downloads and parses an article and wraps the result as a JSON
+    Args:
+        url: the URL of the article
+        source_id: the id of the source in the database
+    """
+    article_map = None
+
+    is_new_url = url_manager.has_url_been_seen(url)
+    hashed_url = hash_url(url)
+    scrapper_logger.info(f"""New:\t{is_new_url}\t{hashed_url}\t{url}""")
+
+    if (not is_new_url):
+        # Add to a cache in the database to avoid reprocessing
+        url_manager.add_url(url)
+
+        # Download and parse URL
+        article3k = article_manager.download_n_parse(url)
+        if (article3k):
+            article_map = article_manager.wrap_as_map(article3k, source_id)
+    return article_map
 
 def wrap_source(source_map):
     """
@@ -48,39 +85,40 @@ def wrap_source(source_map):
     source_id = source_map['id']
     home_url = source_map['home_url']
 
+    scrapper_logger.info(f"""{home_url}""")
+
     # Build a specific source home_url
     # E.g.: home_url: http://www.folha.uol.com.br
     # Read the documentation to understand the steps in building a source
     # https://newspaper.readthedocs.io/en/latest/
-    paper = newspaper.Source(home_url, config.scrapper_cfg)
+    paper = newspaper.Source(home_url, scrapper_cfg)
     paper.build()
 
     article_maps = []
-    for article3k in paper.articles:
-        article_map = wrap_unseen_url(article3k.url, source_id)
-        if (article_map):
+    for article3k in tqdm(paper.articles):
+
+        try:
+            # Remove attributes of the URL
+            cleaned_url = url_manager.clean_url(article3k.url)
+        except ZmbNewsException as e:
+            scrapper_logger.warn(str(e))
+            continue
+
+        article_map = wrap_unseen_url(cleaned_url, source_id)
+        if (article_map and is_relevant(article_map)):
             article_maps.append(article_map)
     return article_maps
 
-def scrape_source_n_save(source_map):
+def is_relevant(article_map):
     """
-    Scrapes a source for published articles and adds them to the articles' table
+    Checks whether an article_map is relevant
     Args:
-        source_map: A map in the following format:
-                    {'id': 1, 'home_url': 'http://www.folha.uol.com.br'}
+        article_map: a dictionary representing the article
+    """
+    url = article_map['url']
+    hashed_url = hash_url(url)
+    is_relevant = RelevanceClassifier.is_relevant(article_map['content'])
+    scrapper_logger.info(f"""Relevant:\t{is_relevant}\t{hashed_url}\t{url}""")
+    return is_relevant
 
-    """
-    article_maps = wrap_source(source_map)
-    if (article_maps):
-        article_manager.add_all_articles(article_maps)
-        return True
-    return False
-
-def scrape_all_sources_n_save():
-    """
-    Scrapes published news for all enabled sources in the database
-    """
-    success = True
-    for source_map in source_manager.find_all_enabled():
-        success = success and scrape_source_n_save(source_map)
-    return success
+scrape_all_sources_n_save()

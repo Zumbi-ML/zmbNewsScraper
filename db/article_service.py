@@ -24,16 +24,18 @@ class ArticleService(BaseService):
         hashed_url = hash_url(article_map['url'])
 
         article = TableArticles( \
-            url=article_map['url'],
+            source_id=article_map['source_id'],
             hashed_url=hashed_url,
+            url=article_map['url'],
             content=article_map['content'],
             published_time=article_map['published_time'],
-            source_id=article_map['source_id'],
             title=article_map['title'],
             keywords=article_map['keywords'],
             section=article_map['section'],
             site_name=article_map['site_name'],
+            authors=article_map['authors'],
             added=date.today(),
+            sent=False,
         )
         self._session.add(article)
 

@@ -1,0 +1,2 @@
+class ZmbNewsException(Exception):
+    pass

@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, BigInteger, String, Date, Text, Boolean
 from sqlalchemy import UniqueConstraint, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from .max_columns_sizes import *
 
 Base = declarative_base()
 
@@ -19,14 +20,14 @@ class TableArticles(Base):
     id = Column('id', Integer, primary_key=True)
     source_id = Column('source_id', Integer, ForeignKey('tb_sources.id'), nullable=False)
     hashed_url = Column('hashed_url', BigInteger, nullable=False)
-    url = Column('url', Text(2048), nullable=False)
-    content = Column('content', Text(30000), nullable=False)
+    url = Column('url', Text(MAX_URL), nullable=False)
+    content = Column('content', Text(MAX_CONTENT), nullable=False)
     published_time = Column('published_time', Date)
-    title = Column('title', Text(200))
-    keywords = Column('keywords', String(400))
-    section = Column('section', String(50))
-    site_name = Column('site_name', String(50))
-    authors = Column('authors', String(100))
+    title = Column('title', Text(MAX_TITLE))
+    keywords = Column('keywords', String(MAX_KEYWORDS))
+    section = Column('section', String(MAX_SECTION))
+    site_name = Column('site_name', String(MAX_SITE_NAME))
+    authors = Column('authors', String(MAX_AUTHORS))
     added = Column('added', Date)
     sent = Column('sent', Boolean, nullable=False)
     table_sources = relationship('TableSources')

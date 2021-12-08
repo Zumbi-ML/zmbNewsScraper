@@ -2,8 +2,12 @@
 
 import json
 from db.article_service import ArticleService
+from db.tables.max_columns_sizes import *
 from newspaper import Article
 from app.relevance_classifiers import RelevanceClassifier
+from config import scrapper_logger
+from utils import hash_url
+import url_manager
 
 def is_url_in_db(a_url):
     """
@@ -42,8 +46,16 @@ def wrap_as_map(article3k, source_id):
     meta_data = article3k.meta_data
 
     article_map = {}
-    article_map['url'] = article3k.url
-    article_map['content'] = article3k.text
+
+    cleaned_url = url_manager.clean_url(article3k.url)
+    article_map['url'] = cleaned_url
+    hashed_url = hash_url(cleaned_url)
+
+    content = article3k.text
+    if (len(content) > MAX_CONTENT):
+        content = article3k.text[0:MAX_CONTENT]
+        scrapper_logger.warn(f"Truncated content:\t{hashed_url}\t{cleaned_url}")
+    article_map['content'] = content
 
     section, published_time = None, None
 
@@ -54,6 +66,9 @@ def wrap_as_map(article3k, source_id):
 
         if ("section" in meta_data['article'].keys()):
             section = meta_data['article']['section']
+            if (len(section) > MAX_SECTION):
+                section = section[0:MAX_SECTION]
+                scrapper_logger.warn(f"Truncated section:\t{hashed_url}\t{cleaned_url}")
 
     article_map['published_time'] = published_time
     article_map['section'] = section
@@ -63,16 +78,36 @@ def wrap_as_map(article3k, source_id):
 
         if ("site_name" in meta_data['og'].keys()):
             site_name = meta_data['og']['site_name']
+            if (len(site_name) > MAX_SITE_NAME):
+                site_name = site_name[0:MAX_SITE_NAME]
+                scrapper_logger.warn(f"Truncated site_name:\t{hashed_url}\t{cleaned_url}")
 
         if ("title" in meta_data['og'].keys()):
             title = meta_data['og']['title']
         else:
             title = article3k.title
 
-    article_map['title'] = title
+        if (len(title) > MAX_TITLE):
+            title = title[0:MAX_TITLE]
+            scrapper_logger.warn(f"Truncated title:\t{hashed_url}\t{cleaned_url}")
+
     article_map['site_name'] = site_name
+    article_map['title'] = title
     article_map['source_id'] = source_id
-    article_map['keywords'] = meta_data['keywords']
+
+    keywords = meta_data['keywords']
+    if (len(keywords) > MAX_KEYWORDS):
+        keywords = keywords[0:MAX_KEYWORDS]
+        scrapper_logger.warn(f"Truncated keywords:\t{hashed_url}\t{cleaned_url}")
+
+    article_map['keywords'] = keywords
+
+    authors = concat_authors(article3k.authors)
+    if (len(authors) > MAX_AUTHORS):
+        authors = authors[0:MAX_AUTHORS]
+        scrapper_logger.warn(f"Truncated authors:\t{hashed_url}\t{cleaned_url}")
+
+    article_map['authors'] = authors
     return article_map
 
 def wrap_as_json(article3k, source_id):
@@ -96,11 +131,10 @@ def download_n_parse(url):
         article.download()
         article.parse()
     except Exception:
-        print("Could not download and parse:")
-        print(url)
-        return None
+        hashed_url = hash_url(url)
+        scrapper_logger.error(f"Download or Parse:\t{hashed_url}\t{url}")
+        return
     return article
-
 
 def get_metadata(url, source_id):
     """
@@ -110,3 +144,24 @@ def get_metadata(url, source_id):
     """
     article3k = download_n_parse(url)
     return wrap_as_json(article3k, source_id)
+
+def concat_authors(lst):
+    """
+    Concatenate a list of authors
+    """
+    concatenated = ""
+    n_authors = len(lst)
+    sep = ", "
+    k = 1
+    MAX_ACCEPTABLE_NAME = 35
+    for author in lst:
+        author = author.strip()
+        # Sometimes, newspaper3k returns authors' minibio
+        if (len(author) > MAX_ACCEPTABLE_NAME):
+            n_authors -= 1
+            continue
+        if (k == n_authors):
+            sep = ""
+        concatenated += author + sep
+        k += 1
+    return concatenated
