@@ -165,3 +165,17 @@ def concat_authors(lst):
         concatenated += author + sep
         k += 1
     return concatenated
+
+def get_all_articles_not_sent():
+    """
+    Returns all articles not sent to the entities database
+    """
+    with ArticleService() as article_svc:
+        return article_svc.read_all_articles_not_sent()
+
+def find_article_by_id(id):
+    """
+    Returns an article by providing its id
+    """
+    with ArticleService() as article_svc:
+        return article_svc.find_article_by_id(id)
