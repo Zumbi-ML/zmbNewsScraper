@@ -4,6 +4,13 @@ from newspaper import Config
 from datetime import date
 import os
 import logging
+import spacy
+import pt_zmbner
+
+# NER Extractor
+# ==============================================================================
+
+nlp = pt_zmbner.load()
 
 # Scraper
 # ==============================================================================
