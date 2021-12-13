@@ -39,3 +39,16 @@ def clean_url(url):
         exc_msg = f"URL too long:\t{cleaned_url}"
         raise ZmbNewsException(exc_msg)
     return cleaned_url
+
+def identify_source_id_by_url(url):
+    """
+    Temporary function
+    """
+    if ("folha." in url):
+        return 1
+    elif ("estadao." in url):
+        return 2
+    elif("oglobo." in url):
+        return 3
+    else:
+        return -1
