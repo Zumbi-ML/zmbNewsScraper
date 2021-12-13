@@ -34,6 +34,7 @@ class ArticleService(BaseService):
             section=article_map['section'],
             site_name=article_map['site_name'],
             authors=article_map['authors'],
+            entities=article_map['entities'],
             added=date.today(),
             sent=False,
         )
@@ -98,5 +99,5 @@ class ArticleService(BaseService):
         Returns an article by providing its database id
         """
         article = self._session.query(TableArticles) \
-                            .filter(TableArticles.id == id).first()
+                                         .filter(TableArticles.id == id).first()
         return self.convert_db_article_into_map(article)

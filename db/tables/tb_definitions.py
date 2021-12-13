@@ -28,6 +28,7 @@ class TableArticles(Base):
     section = Column('section', String(MAX_SECTION))
     site_name = Column('site_name', String(MAX_SITE_NAME))
     authors = Column('authors', String(MAX_AUTHORS))
+    entities = Column('entities', String(MAX_ENTITIES))
     added = Column('added', Date)
     sent = Column('sent', Boolean, nullable=False)
     table_sources = relationship('TableSources')

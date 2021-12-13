@@ -9,6 +9,7 @@ import url_manager
 from utils import hash_url
 from tqdm import tqdm
 from zmb_exceptions import ZmbNewsException
+import ner_manager
 
 def scrape_all_sources_n_save():
     """
@@ -45,9 +46,23 @@ def scrape_url_n_save(url, source_id):
 
     article_map = wrap_unseen_url(cleaned_url, source_id)
     if (article_map and is_relevant(article_map)):
+        article_map = ner_manager.wrap_entities(article_map)
         article_manager.add_article(article_map)
         return True
     return False
+
+def scrape_url_list_n_save(url_lst):
+    """
+    Adds a list of articles' URLs to the article's table if it is considered relevant
+    Args:
+        url_lst: a list of URLs
+    """
+    for url in url_lst:
+        try:
+            source_id = url_manager.identify_source_id_by_url(url)
+            scrape_url_n_save(url, source_id)
+        except ZmbNewsException as e:
+            scrapper_logger.warn(f"A problem ocurred cleaning the URL: {url}")
 
 # Helper functions
 # ==============================================================================
@@ -96,9 +111,8 @@ def wrap_source(source_map):
 
     article_maps = []
     for article3k in tqdm(paper.articles):
-
         try:
-            # Remove attributes of the URL
+            # Remove parameters of the URL
             cleaned_url = url_manager.clean_url(article3k.url)
         except ZmbNewsException as e:
             scrapper_logger.warn(str(e))
@@ -106,6 +120,7 @@ def wrap_source(source_map):
 
         article_map = wrap_unseen_url(cleaned_url, source_id)
         if (article_map and is_relevant(article_map)):
+            article_map = ner_manager.wrap_entities(article_map)
             article_maps.append(article_map)
     return article_maps
 
@@ -120,5 +135,3 @@ def is_relevant(article_map):
     is_relevant = RelevanceClassifier.is_relevant(article_map['content'])
     scrapper_logger.info(f"""Relevant:\t{is_relevant}\t{hashed_url}\t{url}""")
     return is_relevant
-
-scrape_all_sources_n_save()
