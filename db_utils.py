@@ -13,5 +13,3 @@ def drop_n_create_db():
         drop_database(engine.url)
     create_database(engine.url)
     Base.metadata.create_all(engine)
-
-drop_n_create_db()

@@ -24,7 +24,3 @@ def find_all_enabled():
     with SourceService() as source_svc:
         all_sources = source_svc.find_all_enabled()
     return all_sources
-
-#add_source({'name': 'Folha de São Paulo', 'home_url': 'https://www.folha.uol.com.br', 'enabled': True})
-#add_source({'name': 'Estadão', 'home_url': 'https://www.estadao.com.br/', 'enabled': True})
-#add_source({'name': 'O Globo', 'home_url': 'https://oglobo.globo.com/', 'enabled': True})
