@@ -1,4 +1,5 @@
 from datetime import date
+from e_map import ents_2_api_map
 import os
 import sys
 
@@ -21,6 +22,9 @@ def str2date(str_date, sep="-"):
     year, month, day = str_date.split(sep)
     return date(int(year), int(month), int(day))
 
+# Hash
+# ==============================================================================
+
 def hash_url(url):
     """
     Hash a URL with a seed defined in config
@@ -28,10 +32,10 @@ def hash_url(url):
     _ensure_pythonhashseed()
     return hash(url)
 
-# Hash
-# ==============================================================================
-
 def _ensure_pythonhashseed(seed=0):
+    """
+    Ensures that a specific URL returns the same hash everytime
+    """
     current_seed = os.environ.get("PYTHONHASHSEED")
 
     seed = str(seed)
@@ -39,3 +43,15 @@ def _ensure_pythonhashseed(seed=0):
         os.environ["PYTHONHASHSEED"] = seed
         # restart the current process
         os.execl(sys.executable, sys.executable, *sys.argv)
+
+def convert_into_api_format(entities_map):
+    """
+    """
+    api_entities_map = {}
+    for entity_label in entities_map.keys():
+        api_label = ents_2_api_map[entity_label]
+        if (not api_label in api_entities_map.keys()):
+            api_entities_map[api_label] = []
+        for entity in entities_map[entity_label]:
+            api_entities_map[api_label].append(entity)
+    return api_entities_map

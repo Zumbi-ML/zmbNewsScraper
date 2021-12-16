@@ -179,3 +179,12 @@ def find_article_by_id(id):
     """
     with ArticleService() as article_svc:
         return article_svc.find_article_by_id(id)
+
+def mark_article_as_sent(a_url):
+    """
+    Marks an article as sent in the database
+    Args:
+        a_url: the URL to be marked as sent
+    """
+    with ArticleService() as article_svc:
+        return article_svc.mark_article_as_sent(a_url)

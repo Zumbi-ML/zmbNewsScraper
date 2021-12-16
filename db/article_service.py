@@ -90,6 +90,7 @@ class ArticleService(BaseService):
         article_map['section'] = article.section
         article_map['site_name'] = article.site_name
         article_map['authors'] = article.authors
+        article_map['entities'] = article.entities
         article_map['added'] = article.added
         article_map['sent'] = article.sent
         return article_map
@@ -101,3 +102,14 @@ class ArticleService(BaseService):
         article = self._session.query(TableArticles) \
                                          .filter(TableArticles.id == id).first()
         return self.convert_db_article_into_map(article)
+
+    def mark_article_as_sent(self, a_url):
+        """
+        Marks an article as sent in the database
+        Args:
+            a_url: the URL to be marked as sent
+        """
+        hashed_url = hash_url(a_url)
+        self._session.query(TableArticles) \
+                                .filter(TableArticles.hashed_url == hashed_url) \
+                                    .update({TableArticles.sent: True})
