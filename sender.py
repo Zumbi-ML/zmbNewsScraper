@@ -2,7 +2,7 @@
 
 import article_manager
 import asyncio
-from config import posting_logger
+from config import sender_logger
 from dotenv import load_dotenv
 import json
 import ner_manager
@@ -28,7 +28,7 @@ async def send_scrapped_articles():
             response = await post(prepared_to_be_sent_article)
         except HTTPError as e:
             msg = f"[FAILED]\t{url}"
-            posting_logger.error(msg)
+            sender_logger.error(msg)
             continue
 
         json_response = json.loads(response)
@@ -96,8 +96,8 @@ def log_sending_attempt(json_response):
     status_code = json_response['status_code']
     message = json_response['message']
     if (status_code == StatusCode.DUPLICATE_KEY.code()):
-        posting_logger.error(message)
+        sender_logger.error(message)
     elif (status_code == StatusCode.SUCCESS.code()):
-        posting_logger.info(message)
+        sender_logger.info(message)
 
 asyncio.run(send_scrapped_articles())

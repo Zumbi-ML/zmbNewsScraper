@@ -49,4 +49,4 @@ def get_logger(appname):
     return logger
 
 scrapper_logger = get_logger("scrapper")
-posting_logger = get_logger("posting")
+sender_logger = get_logger("sender")
