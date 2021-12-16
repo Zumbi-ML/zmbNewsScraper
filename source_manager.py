@@ -24,3 +24,10 @@ def find_all_enabled():
     with SourceService() as source_svc:
         all_sources = source_svc.find_all_enabled()
     return all_sources
+
+def find_name_by_id(id):
+    """
+    Return the name of the source by id
+    """
+    with SourceService() as source_svc:
+        return source_svc.find_name_by_id(id)

@@ -53,3 +53,12 @@ class SourceService(BaseService):
         """
         for source_map in source_map_lst:
             self.persist(source_map)
+
+    def find_name_by_id(self, id):
+        """
+        Returns the name of the source by looking the id
+        """
+        a_source = self._session.query(TableSources) \
+                                           .filter(TableSources.id == id).first()
+
+        return a_source.name
