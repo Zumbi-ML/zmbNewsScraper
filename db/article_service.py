@@ -3,7 +3,6 @@
 from .base_service import BaseService
 from db.tables.tb_definitions import *
 from datetime import date
-from utils import hash_url
 
 class ArticleService(BaseService):
     """
@@ -21,7 +20,7 @@ class ArticleService(BaseService):
         Args:
             article_map: a dictionary with the data for persisting articles
         """
-        hashed_url = hash_url(article_map['url'])
+        hashed_url = hash(article_map['url'])
 
         article = TableArticles( \
             source_id=article_map['source_id'],
@@ -55,7 +54,7 @@ class ArticleService(BaseService):
         Args:
             a_url: a news article URL
         """
-        hashed_url = hash_url(a_url)
+        hashed_url = hash(a_url)
         result = self._session.query(TableArticles) \
                            .filter(TableArticles.hashed_url == hashed_url).all()
         return True if result else False
@@ -109,7 +108,7 @@ class ArticleService(BaseService):
         Args:
             a_url: the URL to be marked as sent
         """
-        hashed_url = hash_url(a_url)
+        hashed_url = hash(a_url)
         self._session.query(TableArticles) \
                                 .filter(TableArticles.hashed_url == hashed_url) \
                                     .update({TableArticles.sent: True})

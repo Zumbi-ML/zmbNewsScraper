@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from db.source_service import SourceService
+from dotenv import load_dotenv
 
 def add_sources(source_map_lst):
     """

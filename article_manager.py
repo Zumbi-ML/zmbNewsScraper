@@ -1,12 +1,12 @@
 # -*- coding: UTF-8 -*-
 
-import json
-from db.article_service import ArticleService
-from db.tables.max_columns_sizes import *
-from newspaper import Article
 from app.relevance_classifiers import RelevanceClassifier
 from config import scrapper_logger
-from utils import hash_url
+from dotenv import load_dotenv
+from db.article_service import ArticleService
+from db.tables.max_columns_sizes import *
+import json
+from newspaper import Article
 import url_manager
 
 def is_url_in_db(a_url):
@@ -49,7 +49,7 @@ def wrap_as_map(article3k, source_id):
 
     cleaned_url = url_manager.clean_url(article3k.url)
     article_map['url'] = cleaned_url
-    hashed_url = hash_url(cleaned_url)
+    hashed_url = hash(cleaned_url)
 
     content = article3k.text
     if (len(content) > MAX_CONTENT):
@@ -131,7 +131,7 @@ def download_n_parse(url):
         article.download()
         article.parse()
     except Exception:
-        hashed_url = hash_url(url)
+        hashed_url = hash(url)
         scrapper_logger.error(f"Download or Parse:\t{hashed_url}\t{url}")
         return
     return article

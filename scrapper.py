@@ -3,13 +3,13 @@ from app.relevance_classifiers import RelevanceClassifier
 import argparse
 import article_manager
 from config import scrapper_cfg, scrapper_logger
+from dotenv import load_dotenv
+import ner_manager
 import newspaper
 import source_manager
-import url_manager
-from utils import hash_url
 from tqdm import tqdm
+import url_manager
 from zmb_exceptions import ZmbNewsException
-import ner_manager
 
 def scrape_all_sources_n_save():
     """
@@ -77,7 +77,7 @@ def wrap_unseen_url(url, source_id):
     article_map = None
 
     is_new_url = url_manager.has_url_been_seen(url)
-    hashed_url = hash_url(url)
+    hashed_url = hash(url)
     scrapper_logger.info(f"""New:\t{is_new_url}\t{hashed_url}\t{url}""")
 
     if (not is_new_url):
@@ -131,7 +131,7 @@ def is_relevant(article_map):
         article_map: a dictionary representing the article
     """
     url = article_map['url']
-    hashed_url = hash_url(url)
+    hashed_url = hash(url)
     is_relevant = RelevanceClassifier.is_relevant(article_map['content'])
     scrapper_logger.info(f"""Relevant:\t{is_relevant}\t{hashed_url}\t{url}""")
     return is_relevant

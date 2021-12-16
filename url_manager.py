@@ -1,10 +1,11 @@
 # -*- coding: UTF-8 -*-
 
-from db.url_service import UrlService
-from zmb_exceptions import ZmbNewsException
-from db.tables.max_columns_sizes import *
 from config import scrapper_logger
+from db.url_service import UrlService
+from db.tables.max_columns_sizes import *
+from dotenv import load_dotenv
 import re
+from zmb_exceptions import ZmbNewsException
 
 def has_url_been_seen(url):
     """

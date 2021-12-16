@@ -1,7 +1,8 @@
 from config import nlp
 from db.tables.max_columns_sizes import *
 from config import scrapper_logger
-from utils import hash_url
+from utils import convert_into_api_format
+import json
 
 def extract_ents_from_a_sentence(sentence):
     """
@@ -37,30 +38,12 @@ def wrap_entities(article_map, logger=scrapper_logger):
     Adds the entities to the article map, respecting the max column size
     """
     entity_map = extract_ents_from_an_article(article_map['content'])
-    stringfied = stringfy_ents(entity_map)
+    api_entity_map = convert_into_api_format(entity_map)
+    stringfied = json.dumps(api_entity_map)
     if (len(stringfied) > MAX_ENTITIES):
         url = article_map['url']
-        hashed_url = hash_url(url)
+        hashed_url = hash(url)
         logger.warn(f"Truncated entities:\t{hashed_url}\t{url}")
-        stringfied = stringfied[0:MAX_ENTITIES]
+        stringfied = '{"message": "truncated"}'
     article_map['entities'] = stringfied
     return article_map
-
-# Helper functions
-# ==============================================================================
-
-def stringfy_ents(entities_map):
-    """
-    Converts an entities_map into a string
-    """
-    stringfied = ""
-    for label in entities_map.keys():
-        stringfied += label + ":"
-        k = 1
-        for entity in entities_map[label]:
-            stringfied += entity
-            if (k < len(entities_map[label])):
-                stringfied += ","
-            k += 1
-        stringfied += ";"
-    return stringfied

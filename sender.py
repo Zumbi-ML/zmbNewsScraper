@@ -1,27 +1,40 @@
 # -*- coding: UTF-8 -*-
 
+import article_manager
+import asyncio
+from config import posting_logger
+from dotenv import load_dotenv
+import json
+import ner_manager
+from time import sleep
+import requests
+import source_manager
+from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
-import requests
-import article_manager
-import source_manager
-import ner_manager
-import json
-from utils import hash_url
-from urllib.error import HTTPError
-from time import sleep
-import asyncio
 from zmb_codes import StatusCode
-from config import posting_logger
 
-async def post(article_pkg):
+async def send_scrapped_articles():
     """
+    Send an article for saving into the API
     """
-    url = 'http://0.0.0.0:5000/api/v1/articles/'
-    request = Request(url, urlencode(article_pkg).encode())
-    await asyncio.sleep(0.01)
-    response = urlopen(request).read().decode()
-    return response
+    articles_not_sent = article_manager.get_all_articles_not_sent()
+
+    for article in articles_not_sent:
+        prepared_to_be_sent_article = prepare_article(article)
+
+        url = prepared_to_be_sent_article['url']
+        try:
+            response = await post(prepared_to_be_sent_article)
+        except HTTPError as e:
+            msg = f"[FAILED]\t{url}"
+            posting_logger.error(msg)
+            continue
+
+        json_response = json.loads(response)
+
+        mark_article_as_sent(json_response, url)
+        log_sending_attempt(json_response)
 
 def prepare_article(article_map):
     """
@@ -51,38 +64,15 @@ def prepare_article(article_map):
 
     return article_pkg
 
-def log_sending_attempt(json_response):
+async def post(article_pkg):
     """
-    Logs sending attempts
+    Make a post request
     """
-    status_code = json_response['status_code']
-    message = json_response['message']
-    if (status_code == StatusCode.DUPLICATE_KEY.code()):
-        posting_logger.error(message)
-    elif (status_code == StatusCode.SUCCESS.code()):
-        posting_logger.info(message)
-
-async def send_scrapped_articles():
-    """
-    Send an article for saving into the API
-    """
-    articles_not_sent = article_manager.get_all_articles_not_sent()
-
-    for article in articles_not_sent:
-        prepared_to_be_sent_article = prepare_article(article)
-
-        url = prepared_to_be_sent_article['url']
-        try:
-            response = await post(prepared_to_be_sent_article)
-        except HTTPError as e:
-            msg = f"[FAILED]\t{url}"
-            posting_logger.error(msg)
-            continue
-
-        json_response = json.loads(response)
-
-        mark_article_as_sent(json_response, url)
-        log_sending_attempt(json_response)
+    url = 'http://0.0.0.0:5000/api/v1/articles/'
+    request = Request(url, urlencode(article_pkg).encode())
+    await asyncio.sleep(0.01)
+    response = urlopen(request).read().decode()
+    return response
 
 def mark_article_as_sent(json_response, url):
     """
@@ -99,4 +89,15 @@ def mark_article_as_sent(json_response, url):
         # operation has been successful then mark the article as sent
         article_manager.mark_article_as_sent(url)
 
-#asyncio.run(send_scrapped_articles())
+def log_sending_attempt(json_response):
+    """
+    Logs sending attempts
+    """
+    status_code = json_response['status_code']
+    message = json_response['message']
+    if (status_code == StatusCode.DUPLICATE_KEY.code()):
+        posting_logger.error(message)
+    elif (status_code == StatusCode.SUCCESS.code()):
+        posting_logger.info(message)
+
+asyncio.run(send_scrapped_articles())
