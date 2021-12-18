@@ -41,15 +41,42 @@ def clean_url(url):
         raise ZmbNewsException(exc_msg)
     return cleaned_url
 
-def identify_source_id_by_url(url):
+def get_domain(url):
     """
-    Temporary function
+    Returns the domain (and subdomain) of the URL
     """
-    if ("folha." in url):
-        return 1
-    elif ("estadao." in url):
-        return 2
-    elif("oglobo." in url):
-        return 3
+    url = url.lower()
+    # Remove scheme
+    cleaned_url = re.sub(r"https?://", "", url)
+    # Remove subdomain
+    cleaned_url = re.sub(r"www\d?\d?\.", "", cleaned_url)
+
+    # Split by top level domain
+    if (".com" in cleaned_url):
+        sep = ".com"
+    elif (".gov" in cleaned_url):
+        sep = ".gov"
+    elif (".edu" in cleaned_url):
+        sep = ".edu"
+    elif (".leg" in cleaned_url):
+        sep = ".leg"
+    elif (".mil" in cleaned_url):
+        sep = ".mil"
+    elif (".jus" in cleaned_url):
+        sep = ".jus"
+    elif (".org" in cleaned_url):
+        sep = ".org"
+    elif (".inf" in cleaned_url):
+        sep = ".inf"
+    elif (".br" in cleaned_url):
+        sep = ".br"
+    elif (".pt" in cleaned_url):
+        sep = ".pt"
     else:
-        return -1
+        return None
+
+    parts = cleaned_url.split(sep)
+    the_domain = None
+    if (len(parts) > 0):
+        the_domain = parts[0]
+    return the_domain
