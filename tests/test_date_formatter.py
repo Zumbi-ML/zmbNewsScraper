@@ -41,3 +41,7 @@ def test_format_date9():
 def test_format_date10():
     a_date = "04 11 2011"
     assert date_format(a_date) == "2011-11-04"
+
+def test_format_date11():
+    a_date = "2021-03-16T9:35"
+    assert date_format(a_date) == "2021-03-16"

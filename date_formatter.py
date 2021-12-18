@@ -11,7 +11,8 @@ def date_format(a_date):
     Args:
         a_date: the date as a string to be converted
     """
-    a_date = re.sub(r"[ -T](\d{2})?\d\d:\d\d:\d\d.*", "", a_date)
+    a_date = re.sub(r"T.*", "", a_date)
+    a_date = re.sub(r"[ -](\d{2})?\d\d:\d\d.*", "", a_date)
     a_date = re.sub(r",", "", a_date)
 
     if (date_contains_spelled_dow(a_date)):
