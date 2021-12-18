@@ -2,6 +2,7 @@
 
 from db.source_service import SourceService
 from dotenv import load_dotenv
+import url_manager
 
 def add_sources(source_map_lst):
     """
@@ -32,3 +33,14 @@ def find_name_by_id(id):
     """
     with SourceService() as source_svc:
         return source_svc.find_name_by_id(id)
+
+def identify_source_id_by_url(url):
+    """
+    Identifies the source id for a given URL
+    """
+    url_key = url_manager.get_domain(url)
+    if (not url_key):
+        return None
+
+    with SourceService() as source_svc:
+        return source_svc.find_source_id_by_url_key(url_key)

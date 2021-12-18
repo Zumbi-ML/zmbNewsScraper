@@ -38,11 +38,11 @@ class SourceService(BaseService):
         """
         source = TableSources( \
             name=source_map['name'],
+            url_key=source_map['url_key'],
             home_url=source_map['home_url'],
             enabled=source_map['enabled'],
         )
         self._session.add(source)
-
 
     def persist_all(self, source_map_lst):
         """
@@ -59,6 +59,13 @@ class SourceService(BaseService):
         Returns the name of the source by looking the id
         """
         a_source = self._session.query(TableSources) \
-                                           .filter(TableSources.id == id).first()
-
+                                          .filter(TableSources.id == id).first()
         return a_source.name
+
+    def find_source_id_by_url_key(self, url_key):
+        """
+        Returns the source_id by providing a URL key
+        """
+        a_source = self._session.query(TableSources) \
+                                .filter(TableSources.url_key == url_key).first()
+        return a_source.id

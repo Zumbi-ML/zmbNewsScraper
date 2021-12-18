@@ -23,6 +23,14 @@ scrapper_cfg.browser_user_agent = USER_AGENT
 scrapper_cfg.request_timeout = 10
 scrapper_cfg.memoize_articles = False
 
+
+# RelevanceClassifier
+# ==============================================================================
+
+RELEV_CLF_DIR = "app/classifiers/"
+
+RELEV_CLF_MODEL = RELEV_CLF_DIR + "multinomial_nb_clf.pkl"
+
 # Loggers
 # ==============================================================================
 
@@ -50,3 +58,11 @@ def get_logger(appname):
 
 scrapper_logger = get_logger("scrapper")
 sender_logger = get_logger("sender")
+
+# Relevant URLs
+# ==============================================================================
+DATA_DIR = "data/"
+
+RELEVANT_URLs_DIR = DATA_DIR + "URLs/"
+
+RELEVANT_URLs_FILE = RELEVANT_URLs_DIR + "relevant-URLs.tsv"

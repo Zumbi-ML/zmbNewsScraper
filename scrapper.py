@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-from app.relevance_classifiers import RelevanceClassifier
+from app.classifiers.relevance_classifiers import MutinomialNBClf
 import argparse
 import article_manager
 from config import scrapper_cfg, scrapper_logger
@@ -10,6 +10,8 @@ import source_manager
 from tqdm import tqdm
 import url_manager
 from zmb_exceptions import ZmbNewsException
+
+relevance_clf = MutinomialNBClf()
 
 def scrape_all_sources_n_save():
     """
@@ -58,8 +60,12 @@ def scrape_url_list_n_save(url_lst):
         url_lst: a list of URLs
     """
     for url in url_lst:
+        if (not url):
+            continue
         try:
-            source_id = url_manager.identify_source_id_by_url(url)
+            source_id = source_manager.identify_source_id_by_url(url)
+            if (not source_id):
+                continue
             scrape_url_n_save(url, source_id)
         except ZmbNewsException as e:
             scrapper_logger.warn(f"A problem ocurred cleaning the URL: {url}")
@@ -130,8 +136,13 @@ def is_relevant(article_map):
     Args:
         article_map: a dictionary representing the article
     """
+    is_relevant = relevance_clf.is_relevant(article_map['content'])
+
+    # Logging
     url = article_map['url']
     hashed_url = hash(url)
-    is_relevant = RelevanceClassifier.is_relevant(article_map['content'])
-    scrapper_logger.info(f"""Relevant:\t{is_relevant}\t{hashed_url}\t{url}""")
+    msg = f"""Relevant:\t{is_relevant}\t{hashed_url}\t{url}"""
+    scrapper_logger.info(msg)
+    print(msg)
+
     return is_relevant

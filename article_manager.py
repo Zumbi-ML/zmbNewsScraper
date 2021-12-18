@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 
-from app.relevance_classifiers import RelevanceClassifier
 from config import scrapper_logger
 from dotenv import load_dotenv
+from date_formatter import date_format
 from db.article_service import ArticleService
 from db.tables.max_columns_sizes import *
 import json
@@ -52,6 +52,7 @@ def wrap_as_map(article3k, source_id):
     hashed_url = hash(cleaned_url)
 
     content = article3k.text
+
     if (len(content) > MAX_CONTENT):
         content = article3k.text[0:MAX_CONTENT]
         scrapper_logger.warn(f"Truncated content:\t{hashed_url}\t{cleaned_url}")
@@ -59,33 +60,41 @@ def wrap_as_map(article3k, source_id):
 
     section, published_time = None, None
 
-    if ("article" in meta_data.keys()):
+    if (isinstance(meta_data, dict) and "article" in meta_data.keys()):
 
-        if ("published_time" in meta_data['article'].keys()):
-            published_time = meta_data['article']['published_time']
+        if (isinstance(meta_data['article'], dict)):
 
-        if ("section" in meta_data['article'].keys()):
-            section = meta_data['article']['section']
-            if (len(section) > MAX_SECTION):
-                section = section[0:MAX_SECTION]
-                scrapper_logger.warn(f"Truncated section:\t{hashed_url}\t{cleaned_url}")
+            if ("published_time" in meta_data['article'].keys()):
+                pub_time = meta_data['article']['published_time']
+                published_time = date_format(pub_time)
+                if (not published_time):
+                    scrapper_logger.warn(f"Could not convert {pub_time}")
+
+            if ("section" in meta_data['article'].keys()):
+                section = meta_data['article']['section']
+                if (len(section) > MAX_SECTION):
+                    section = section[0:MAX_SECTION]
+                    scrapper_logger.warn(f"Truncated section:\t{hashed_url}\t{cleaned_url}")
 
     article_map['published_time'] = published_time
     article_map['section'] = section
 
     site_name, title = None, None
-    if ("og" in meta_data.keys()):
+    if (isinstance(meta_data, dict) and "og" in meta_data.keys()):
 
-        if ("site_name" in meta_data['og'].keys()):
-            site_name = meta_data['og']['site_name']
-            if (len(site_name) > MAX_SITE_NAME):
-                site_name = site_name[0:MAX_SITE_NAME]
-                scrapper_logger.warn(f"Truncated site_name:\t{hashed_url}\t{cleaned_url}")
+        if (isinstance(meta_data['og'], dict)):
 
-        if ("title" in meta_data['og'].keys()):
-            title = meta_data['og']['title']
-        else:
-            title = article3k.title
+            if ("site_name" in meta_data['og'].keys()):
+
+                site_name = meta_data['og']['site_name']
+                if (len(site_name) > MAX_SITE_NAME):
+                    site_name = site_name[0:MAX_SITE_NAME]
+                    scrapper_logger.warn(f"Truncated site_name:\t{hashed_url}\t{cleaned_url}")
+
+            if ("title" in meta_data['og'].keys()):
+                title = meta_data['og']['title']
+            else:
+                title = article3k.title
 
         if (len(title) > MAX_TITLE):
             title = title[0:MAX_TITLE]
@@ -95,11 +104,12 @@ def wrap_as_map(article3k, source_id):
     article_map['title'] = title
     article_map['source_id'] = source_id
 
-    keywords = meta_data['keywords']
-    if (len(keywords) > MAX_KEYWORDS):
-        keywords = keywords[0:MAX_KEYWORDS]
-        scrapper_logger.warn(f"Truncated keywords:\t{hashed_url}\t{cleaned_url}")
-
+    keywords = None
+    if (isinstance(meta_data, dict) and "keywords" in meta_data.keys()):
+        keywords = meta_data['keywords']
+        if (len(keywords) > MAX_KEYWORDS):
+            keywords = keywords[0:MAX_KEYWORDS]
+            scrapper_logger.warn(f"Truncated keywords:\t{hashed_url}\t{cleaned_url}")
     article_map['keywords'] = keywords
 
     authors = concat_authors(article3k.authors)
