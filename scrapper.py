@@ -3,7 +3,6 @@ from app.classifiers.relevance_classifiers import MutinomialNBClf
 import argparse
 import article_manager
 from config import scrapper_cfg, scrapper_logger
-from dotenv import load_dotenv
 import ner_manager
 import newspaper
 import source_manager
@@ -84,7 +83,10 @@ def wrap_unseen_url(url, source_id):
 
     is_new_url = url_manager.has_url_been_seen(url)
     hashed_url = hash(url)
-    scrapper_logger.info(f"""New:\t{is_new_url}\t{hashed_url}\t{url}""")
+
+    msg = f"""New:\t{is_new_url}\t{hashed_url}\t{url}"""
+    scrapper_logger.info(msg)
+    print(msg)
 
     if (not is_new_url):
         # Add to a cache in the database to avoid reprocessing
@@ -106,7 +108,9 @@ def wrap_source(source_map):
     source_id = source_map['id']
     home_url = source_map['home_url']
 
-    scrapper_logger.info(f"""{home_url}""")
+    msg = f"""{home_url}"""
+    scrapper_logger.info(msg)
+    print(msg)
 
     # Build a specific source home_url
     # E.g.: home_url: http://www.folha.uol.com.br
