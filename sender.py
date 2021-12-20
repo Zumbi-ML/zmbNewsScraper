@@ -13,6 +13,9 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from zmb_codes import StatusCode
+from zmb_api import ZmbApi
+
+load_dotenv()
 
 async def send_scrapped_articles():
     """
@@ -68,7 +71,7 @@ async def post(article_pkg):
     """
     Make a post request
     """
-    url = 'http://0.0.0.0:5000/api/v1/articles/'
+    url = ZmbApi.Article.path()
     request = Request(url, urlencode(article_pkg).encode())
     await asyncio.sleep(0.01)
     response = urlopen(request).read().decode()

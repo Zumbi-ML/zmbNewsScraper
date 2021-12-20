@@ -9,6 +9,7 @@ import source_manager
 from tqdm import tqdm
 import url_manager
 from zmb_exceptions import ZmbNewsException
+from hasher import hash_url
 
 relevance_clf = MutinomialNBClf()
 
@@ -81,14 +82,14 @@ def wrap_unseen_url(url, source_id):
     """
     article_map = None
 
-    is_new_url = url_manager.has_url_been_seen(url)
-    hashed_url = hash(url)
+    is_new_url = not url_manager.has_url_been_seen(url)
+    hashed_url = hash_url(url)
 
     msg = f"""New:\t{is_new_url}\t{hashed_url}\t{url}"""
     scrapper_logger.info(msg)
     print(msg)
 
-    if (not is_new_url):
+    if (is_new_url):
         # Add to a cache in the database to avoid reprocessing
         url_manager.add_url(url)
 
@@ -144,7 +145,7 @@ def is_relevant(article_map):
 
     # Logging
     url = article_map['url']
-    hashed_url = hash(url)
+    hashed_url = hash_url(url)
     msg = f"""Relevant:\t{is_relevant}\t{hashed_url}\t{url}"""
     scrapper_logger.info(msg)
     print(msg)

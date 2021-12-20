@@ -3,6 +3,7 @@ from db.tables.max_columns_sizes import *
 from config import scrapper_logger
 from utils import convert_into_api_format
 import json
+from hasher import hash_url
 
 def extract_ents_from_a_sentence(sentence):
     """
@@ -42,7 +43,7 @@ def wrap_entities(article_map, logger=scrapper_logger):
     stringfied = json.dumps(api_entity_map)
     if (len(stringfied) > MAX_ENTITIES):
         url = article_map['url']
-        hashed_url = hash(url)
+        hashed_url = hash_url(url)
         logger.warn(f"Truncated entities:\t{hashed_url}\t{url}")
         stringfied = '{"message": "truncated"}'
     article_map['entities'] = stringfied

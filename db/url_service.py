@@ -3,6 +3,7 @@
 from .base_service import BaseService
 from db.tables.tb_definitions import *
 from datetime import date
+from hasher import hash_url
 
 class UrlService(BaseService):
 
@@ -18,7 +19,7 @@ class UrlService(BaseService):
         Args:
             a_url: a news article URL
         """
-        hashed_url = hash(a_url)
+        hashed_url = hash_url(a_url)
         result = self._session.query(TableURL) \
                            .filter(TableURL.hashed_url == hashed_url).all()
         return True if result else False
@@ -29,7 +30,7 @@ class UrlService(BaseService):
         Args:
             url: the url to be persisted
         """
-        hashed_url = hash(url)
+        hashed_url = hash_url(url)
         tableUrl = TableURL(\
             hashed_url=hashed_url,
             url=url,

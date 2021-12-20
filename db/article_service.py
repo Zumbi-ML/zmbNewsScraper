@@ -3,6 +3,7 @@
 from .base_service import BaseService
 from db.tables.tb_definitions import *
 from datetime import date
+from hasher import hash_url
 
 class ArticleService(BaseService):
     """
@@ -20,22 +21,25 @@ class ArticleService(BaseService):
         Args:
             article_map: a dictionary with the data for persisting articles
         """
-        hashed_url = hash(article_map['url'])
+        hashed_url = hash_url(article_map['url'])
 
         article = TableArticles( \
-            source_id=article_map['source_id'],
-            hashed_url=hashed_url,
-            url=article_map['url'],
-            content=article_map['content'],
-            published_time=article_map['published_time'],
-            title=article_map['title'],
-            keywords=article_map['keywords'],
-            section=article_map['section'],
-            site_name=article_map['site_name'],
-            authors=article_map['authors'],
-            entities=article_map['entities'],
-            added=date.today(),
-            sent=False,
+            source_id = article_map['source_id'],
+            hashed_url = hashed_url,
+            url = article_map['url'],
+            content = article_map['content'],
+            published_time = article_map['published_time'],
+            title = article_map['title'],
+            keywords = article_map['keywords'],
+            section = article_map['section'],
+            site_name = article_map['site_name'],
+            authors = article_map['authors'],
+            entities = article_map['entities'],
+            html = article_map['html'],
+            meta_data = article_map['meta_data'],
+            added = date.today(),
+            sent = False,
+            n_sents = 0,
         )
         self._session.add(article)
 
@@ -54,7 +58,7 @@ class ArticleService(BaseService):
         Args:
             a_url: a news article URL
         """
-        hashed_url = hash(a_url)
+        hashed_url = hash_url(a_url)
         result = self._session.query(TableArticles) \
                            .filter(TableArticles.hashed_url == hashed_url).all()
         return True if result else False
@@ -92,6 +96,8 @@ class ArticleService(BaseService):
         article_map['entities'] = article.entities
         article_map['added'] = article.added
         article_map['sent'] = article.sent
+        article_map['html'] = article.html
+        article_map['meta_data'] = article.meta_data
         return article_map
 
     def find_article_by_id(self, id):
@@ -108,7 +114,7 @@ class ArticleService(BaseService):
         Args:
             a_url: the URL to be marked as sent
         """
-        hashed_url = hash(a_url)
+        hashed_url = hash_url(a_url)
         self._session.query(TableArticles) \
                                 .filter(TableArticles.hashed_url == hashed_url) \
                                     .update({TableArticles.sent: True})

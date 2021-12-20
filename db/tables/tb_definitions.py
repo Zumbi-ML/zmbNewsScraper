@@ -10,16 +10,19 @@ class TableURL(Base):
     __tablename__ = "tb_urls"
     __table_args__ = (UniqueConstraint('hashed_url', name="urlx_2"),)
     id = Column('id', Integer, primary_key=True)
-    hashed_url = Column('hashed_url', BigInteger, nullable=False)
+    hashed_url = Column('hashed_url', String(HASH_SIZE), nullable=False)
     url = Column('url', Text(2048), nullable=False)
     added = Column('added', Date, nullable=False)
 
 class TableArticles(Base):
     __tablename__ = "tb_articles"
-    __table_args__ = (UniqueConstraint('hashed_url', name="urlx_1"),)
+    __table_args__ = (UniqueConstraint('hashed_url', name="urlx_1"),
+                        {'mysql_default_charset': 'utf8mb4',
+                         'mysql_collate': 'utf8mb4_unicode_ci'})
+
     id = Column('id', Integer, primary_key=True)
     source_id = Column('source_id', Integer, ForeignKey('tb_sources.id'), nullable=False)
-    hashed_url = Column('hashed_url', BigInteger, nullable=False)
+    hashed_url = Column('hashed_url', String(HASH_SIZE), nullable=False)
     url = Column('url', Text(MAX_URL), nullable=False)
     content = Column('content', Text(MAX_CONTENT), nullable=False)
     published_time = Column('published_time', Date)
@@ -29,8 +32,11 @@ class TableArticles(Base):
     site_name = Column('site_name', String(MAX_SITE_NAME))
     authors = Column('authors', String(MAX_AUTHORS))
     entities = Column('entities', String(MAX_ENTITIES))
+    html = Column('html', Text(MAX_HTML))
     added = Column('added', Date)
     sent = Column('sent', Boolean, nullable=False)
+    n_sents = Column('n_sents', Integer)
+    meta_data = Column('meta_data', Text(MAX_METADATA))
     table_sources = relationship('TableSources')
 
 class TableSources(Base):

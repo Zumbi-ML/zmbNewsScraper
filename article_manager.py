@@ -8,6 +8,7 @@ from db.tables.max_columns_sizes import *
 import json
 from newspaper import Article
 import url_manager
+from hasher import hash_url
 
 def is_url_in_db(a_url):
     """
@@ -43,13 +44,20 @@ def wrap_as_map(article3k, source_id):
         article3k: an instance of an newspaper.Article
         source_id: the id of the source (eg: Folha) in the database
     """
-    meta_data = article3k.meta_data
 
     article_map = {}
+    meta_data = article3k.meta_data
+
+    str_metadata = ""
+    if (isinstance(meta_data, dict)):
+        str_metadata = json.dumps(meta_data, sort_keys=True, indent=4)
+    elif (isinstance(meta_data, str)):
+        str_metadata = meta_data
+    article_map['meta_data'] = str_metadata
 
     cleaned_url = url_manager.clean_url(article3k.url)
     article_map['url'] = cleaned_url
-    hashed_url = hash(cleaned_url)
+    hashed_url = hash_url(cleaned_url)
 
     content = article3k.text
 
@@ -118,6 +126,8 @@ def wrap_as_map(article3k, source_id):
         scrapper_logger.warn(f"Truncated authors:\t{hashed_url}\t{cleaned_url}")
 
     article_map['authors'] = authors
+    article_map['html'] = article3k.html
+
     return article_map
 
 def wrap_as_json(article3k, source_id):
@@ -141,7 +151,7 @@ def download_n_parse(url):
         article.download()
         article.parse()
     except Exception:
-        hashed_url = hash(url)
+        hashed_url = hash_url(url)
         scrapper_logger.error(f"Download or Parse:\t{hashed_url}\t{url}")
         return
     return article
