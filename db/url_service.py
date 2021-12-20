@@ -6,11 +6,11 @@ from datetime import date
 
 class UrlService(BaseService):
 
-    def __init__(self):
+    def __init__(self, session=None, commit_on_exit=True, close_on_exit=True):
         """
         Constructor
         """
-        super().__init__()
+        super().__init__(session=session, commit_on_exit=commit_on_exit, close_on_exit=close_on_exit)
 
     def has_url_been_seen(self, a_url):
         """
