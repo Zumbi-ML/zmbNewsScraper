@@ -6,6 +6,7 @@ import os
 import logging
 import spacy
 import pt_zmbner
+from zmb_loggers import get_logger
 
 # NER Extractor
 # ==============================================================================
@@ -34,30 +35,9 @@ RELEV_CLF_MODEL = RELEV_CLF_DIR + "multinomial_nb_clf.pkl"
 # Loggers
 # ==============================================================================
 
-LOGS_DIR = '/logs'
-LOGS_FILE_EXT = '.log'
-
-def get_logger(appname):
-    """
-    Obtains a logger
-    Args:
-        appname: the name of the app to be logged
-    """
-    log_dir_path = os.path.dirname(os.path.realpath(__file__)) + LOGS_DIR
-    log_filename = date.today().strftime(f"{appname}_%Y-%m-%d") + LOGS_FILE_EXT
-    log_full_filename = os.path.join(log_dir_path, log_filename)
-
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)
-
-    file_handler = logging.FileHandler(log_full_filename)
-    file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(logging.Formatter('%(asctime)s\t%(levelname)s\t%(message)s'))
-    logger.addHandler(file_handler)
-    return logger
-
-scrapper_logger = get_logger("scrapper")
-sender_logger = get_logger("sender")
+scrapper_logger = get_logger("scrapper", enum_each_exec=True)
+sender_logger = get_logger("sender", enum_each_exec=True)
+date_formatter = get_logger("date_formatter", enum_each_exec=False)
 
 # Relevant URLs
 # ==============================================================================
