@@ -1,8 +1,5 @@
-import os
+from hasher import hash_url
 
 def test_hashing():
     url = "http://domain.com/"
-    assert hash(url) == -345501838550440081
-
-def test_seed_value():
-    assert os.environ['PYTHONHASHSEED'] == '0'
+    assert hash_url(url) == '0f4366de78756f34670f5bc4969f84d3'
