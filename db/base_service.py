@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 from db.credentials import get_session
+from sqlalchemy.exc import IntegrityError
 
 class BaseService(object):
     """
@@ -26,7 +27,11 @@ class BaseService(object):
         """
         On exit
         """
-        if (self._session and self._commit_on_exit):
+        try:
+            # Connection must be closed when an exception happens here
             self._session.commit()
+        except IntegrityError as e:
+            self._session.close()
+            raise e
         if (self._session and self._close_on_exit):
             self._session.close()

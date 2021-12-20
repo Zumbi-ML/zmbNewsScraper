@@ -8,11 +8,11 @@ class ArticleService(BaseService):
     """
     Is in charge of managing the database session for larger tasks
     """
-    def __init__(self):
+    def __init__(self, session=None, commit_on_exit=True, close_on_exit=True):
         """
         Constructor
         """
-        super().__init__()
+        super().__init__(session=session, commit_on_exit=commit_on_exit, close_on_exit=close_on_exit)
 
     def persist(self, article_map):
         """
