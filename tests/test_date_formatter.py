@@ -45,3 +45,12 @@ def test_format_date10():
 def test_format_date11():
     a_date = "2021-03-16T9:35"
     assert date_format(a_date) == "2021-03-16"
+
+def test_format_date12():
+    a_date = "2020-10-4T9:00"
+    assert date_format(a_date) == "2020-10-04"
+
+def test_format_date13():
+    # Unknown separator
+    a_date = "2020|10|04"
+    assert date_format(a_date) == None

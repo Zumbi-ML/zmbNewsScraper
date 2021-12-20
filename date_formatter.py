@@ -60,10 +60,10 @@ def split_into_year_mon_day(a_date, sep):
         return None, None, None
 
     if is_a_year(parts[0]):
-        year = parts[0]
+        year = pad_with_zero(parts[0])
         day_idx = 2
     elif is_a_year(parts[2]):
-        year = parts[2]
+        year = pad_with_zero(parts[2])
         day_idx = 0
     else:
         # If the year cannot be determined, return None
@@ -71,17 +71,25 @@ def split_into_year_mon_day(a_date, sep):
 
     day = None
     if is_a_day_of_month(parts[day_idx]):
-        day = parts[day_idx]
+        day = pad_with_zero(parts[day_idx])
     else:
         return None, None, None
 
     month = None
     if is_a_month(parts[1]):
-        month = parts[1]
+        month = pad_with_zero(parts[1])
     else:
         return None, None, None
 
     return year, month, day
+
+def pad_with_zero(date_part):
+    """
+    Pads a date part with zero if necessary
+    """
+    int_dp = int(date_part)
+    padded = "0" + str(int_dp) if int_dp < 10 else str(int_dp)
+    return padded
 
 def is_a_year(date_part):
     """
@@ -89,7 +97,7 @@ def is_a_year(date_part):
     Args:
         date_part: Ex: "2011"
     """
-    if (len(date_part) == 4 and int(date_part) > 1970):
+    if (int(date_part) > 1970):
         return True
     return False
 
@@ -99,7 +107,7 @@ def is_a_month(date_part):
     Args:
         date_part:  Ex: "12"
     """
-    if (len(date_part) == 2 and int(date_part) >= 1 and int(date_part) <= 12):
+    if (int(date_part) >= 1 and int(date_part) <= 12):
         return True
     return False
 
@@ -109,7 +117,7 @@ def is_a_day_of_month(date_part):
     Args:
         date_part: Ex: "31"
     """
-    if (len(date_part) == 2 and int(date_part) >= 1 and int(date_part) <= 31):
+    if (int(date_part) >= 1 and int(date_part) <= 31):
         return True
     return False
 
@@ -133,7 +141,7 @@ def sub_spelled_month(a_date):
     for month in MONTHS:
         if (month in a_date.lower()):
             num_month = MONTHS.index(month) + 1
-            str_month = "0" + str(num_month) if num_month < 10 else str(num_month)
+            str_month = pad_with_zero(num_month)
             return re.sub(month, str_month, a_date.lower())
 
 def date_contains_spelled_dow(a_date):
