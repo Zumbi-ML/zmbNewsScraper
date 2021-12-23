@@ -28,18 +28,9 @@ def get_logger(appname, enum_each_exec=False):
 
     base_log_filename = date.today().strftime(f"{appname}_%Y-%m-%d")
 
-    if (enum_each_exec):
-        i = 0
-        log_file_exists = True
-        while log_file_exists:
-            i += 1
-            log_filename = f"{base_log_filename}_{i}{LOGS_FILE_EXT}"
-            log_full_filename = os.path.join(app_logs_dir, log_filename)
-            log_file_exists = os.path.isfile(log_full_filename)
-    else:
-        log_full_filename = os.path.join(app_logs_dir, base_log_filename)
+    log_full_filename = os.path.join(app_logs_dir, f"{base_log_filename}{LOGS_FILE_EXT}")
 
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger(appname)
     logger.setLevel(logging.INFO)
 
     file_handler = logging.FileHandler(log_full_filename)
