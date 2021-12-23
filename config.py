@@ -30,7 +30,8 @@ scrapper_cfg.memoize_articles = False
 
 RELEV_CLF_DIR = "app/classifiers/"
 
-RELEV_CLF_MODEL = RELEV_CLF_DIR + "multinomial_nb_clf.pkl"
+MULTINOMIAL_CLF_MODEL = RELEV_CLF_DIR + "multinomial_nb_clf.pkl"
+BERNOULLI_CLF_MODEL = RELEV_CLF_DIR + "bernoulli_nb_clf.pkl"
 
 # Loggers
 # ==============================================================================
