@@ -1,9 +1,9 @@
 from config import nlp
 from db.tables.max_columns_sizes import *
 from config import scrapper_logger
-from utils import convert_into_api_format
 import json
 from hasher import hash_url
+from zmb_labels import ZmbLabels
 
 def extract_ents_from_a_sentence(sentence):
     """
@@ -39,7 +39,7 @@ def wrap_entities(article_map, logger=scrapper_logger):
     Adds the entities to the article map, respecting the max column size
     """
     entity_map = extract_ents_from_an_article(article_map['content'])
-    api_entity_map = convert_into_api_format(entity_map)
+    api_entity_map = ZmbLabels.convert_into_api_format(entity_map)
     stringfied = json.dumps(api_entity_map)
     if (len(stringfied) > MAX_ENTITIES):
         url = article_map['url']
