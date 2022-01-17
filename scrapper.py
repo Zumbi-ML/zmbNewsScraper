@@ -1,6 +1,4 @@
 # -*- coding: UTF-8 -*-
-from app.classifiers.relevance_classifiers import MutinomialNBClf
-import argparse
 import article_manager
 from config import scrapper_cfg, scrapper_logger
 import ner_manager
@@ -8,10 +6,11 @@ import newspaper
 import source_manager
 from tqdm import tqdm
 import url_manager
-from zmb_exceptions import ZmbNewsException
 from hasher import hash_url
+from zmb_exceptions import ZmbNewsException
+from zmbrelev.classifiers import BernoulliNBClf
 
-relevance_clf = MutinomialNBClf()
+relevance_clf = BernoulliNBClf()
 
 def scrape_all_sources_n_save():
     """
@@ -85,7 +84,7 @@ def wrap_unseen_url(url, source_id):
     is_new_url = not url_manager.has_url_been_seen(url)
     hashed_url = hash_url(url)
 
-    msg = f"""New:\t{is_new_url}\t{hashed_url}\t{url}"""
+    msg = f"""NEW\t{is_new_url}\t\t{hashed_url}\t{url}"""
     scrapper_logger.info(msg)
     print(msg)
 
@@ -141,13 +140,13 @@ def is_relevant(article_map):
     Args:
         article_map: a dictionary representing the article
     """
-    is_relevant = relevance_clf.is_relevant(article_map['content'])
+    is_relev, proba = relevance_clf.relev_thld(article_map['content'])
 
     # Logging
     url = article_map['url']
     hashed_url = hash_url(url)
-    msg = f"""Relevant:\t{is_relevant}\t{hashed_url}\t{url}"""
+    msg = f"""RELEV\t{is_relev}\tProba:\t{proba[1]}\t{url}"""
     scrapper_logger.info(msg)
     print(msg)
 
-    return is_relevant
+    return is_relev
