@@ -4,14 +4,7 @@ from newspaper import Config
 from datetime import date
 import os
 import logging
-import spacy
-import pt_zmbner
 from zmb_loggers import get_logger
-
-# NER Extractor
-# ==============================================================================
-
-nlp = pt_zmbner.load()
 
 # Scraper
 # ==============================================================================
@@ -22,7 +15,7 @@ USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100
 scrapper_cfg = Config()
 scrapper_cfg.browser_user_agent = USER_AGENT
 scrapper_cfg.request_timeout = 10
-scrapper_cfg.memoize_articles = False
+scrapper_cfg.memoize_articles = True
 
 
 # RelevanceClassifier
