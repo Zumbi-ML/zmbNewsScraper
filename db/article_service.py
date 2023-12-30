@@ -83,7 +83,7 @@ class ArticleService(BaseService):
             article: TableArticles object
         """
         article_map = {}
-        article_map['source_id'] = article.source_id
+        #article_map['source_id'] = article.source_id
         article_map['hashed_url'] = article.hashed_url
         article_map['url'] = article.url
         article_map['content'] = article.content

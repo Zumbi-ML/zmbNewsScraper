@@ -36,7 +36,7 @@ def scrape_source_n_save(source_map):
 
 def scrape_url_n_save(url, source_id):
     """
-    Adds the article to the article's table if it is considered relevant
+    Adds the article to the article's table
     Args:
         url: the URL of the article
         source_id: the id of the source in the database
@@ -46,11 +46,9 @@ def scrape_url_n_save(url, source_id):
     cleaned_url = url_manager.clean_url(url)
 
     article_map = wrap_unseen_url(cleaned_url, source_id)
-    if (article_map and is_relevant(article_map)):
+    if (article_map):
         article_map = ner_manager.wrap_entities(article_map)
         article_manager.add_article(article_map)
-        return True
-    return False
 
 def scrape_url_list_n_save(url_lst):
     """
@@ -58,7 +56,7 @@ def scrape_url_list_n_save(url_lst):
     Args:
         url_lst: a list of URLs
     """
-    for url in url_lst:
+    for url in tqdm(url_lst):
         if (not url):
             continue
         try:
@@ -110,7 +108,7 @@ def wrap_source(source_map):
 
     msg = f"""{home_url}"""
     scrapper_logger.info(msg)
-    print(msg)
+    #print(msg)
 
     # Build a specific source home_url
     # E.g.: home_url: http://www.folha.uol.com.br
@@ -147,6 +145,6 @@ def is_relevant(article_map):
     hashed_url = hash_url(url)
     msg = f"""RELEV\t{is_relev}\tProba:\t{proba[1]}\t{url}"""
     scrapper_logger.info(msg)
-    print(msg)
+    #print(msg)
 
     return is_relev

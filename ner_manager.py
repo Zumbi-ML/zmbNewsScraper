@@ -9,7 +9,6 @@ def wrap_entities(article_map, logger=scrapper_logger):
     Adds the entities to the article map, respecting the max column size
     """
     entity_map = ZmbNER.ents(article_map['content'])
-    print(entity_map)
     stringfied = json.dumps(entity_map)
     if (len(stringfied) > MAX_ENTITIES):
         url = article_map['url']

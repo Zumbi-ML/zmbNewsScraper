@@ -1,6 +1,5 @@
 from db_utils import drop_n_create_db
 from source_manager import add_sources
-from URLs import urls
 from scrapper import *
 
 drop_n_create_db()
@@ -215,7 +214,6 @@ def get_sources():
         ["noticiasdatv.uol", "UOL", None, 0],
         ["tvefamosos.uol", "UOL", None, 0],
         ["entretenimento.uol", "UOL", None, 0],
-        ["aovivo.folha.uol", "UOL", None, 0],
         ["educacao.uol", "UOL", None, 0],
         ["economia.uol", "UOL", None, 0],
         ["noticias.uol", "UOL", None, 0],
@@ -232,7 +230,11 @@ def get_sources():
         ["vogue.globo", "Vogue", None, 0],
         ["esportes.yahoo", "Yahoo Esportes", None, 0],
         ["br.financas.yahoo", "Yahoo Finanças", None, 0],
-        ["br.noticias.yahoo", "Yahoo Notícias", None, 0]]
+        ["br.noticias.yahoo", "Yahoo Notícias", None, 0],
+        ["esquerda", "Esquerda.net", None, 0],
+        ["coletiva", "Coletiva.net", None, 0],
+        ["aeroin", "AEROIN", None, 0],
+        ]
 
 source_map_list = []
 for source in get_sources():
@@ -242,6 +244,6 @@ for source in get_sources():
     )
 add_sources(source_map_list)
 
-#scrape_url_list_n_save(urls)
+scrape_url_list_n_save(urls)
 
 #scrape_url_n_save('https://www1.folha.uol.com.br/poder/2021/12/simone-tebet-se-lanca-pre-candidata-a-presidencia-e-critica-lideres-que-dividem-pais.shtml', 1)

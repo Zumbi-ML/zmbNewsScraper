@@ -58,6 +58,8 @@ def get_domain(url):
         sep = ".gov"
     elif (".edu" in cleaned_url):
         sep = ".edu"
+    elif (".net" in cleaned_url):
+        sep = ".net"
     elif (".leg" in cleaned_url):
         sep = ".leg"
     elif (".mil" in cleaned_url):
@@ -79,4 +81,11 @@ def get_domain(url):
     the_domain = None
     if (len(parts) > 0):
         the_domain = parts[0]
+
+    if ("folha.uol" in the_domain):
+        return "folha.uol"
+    elif ("estadao" in the_domain):
+        return "estadao"
+    elif ("blogfolha.uol" in the_domain):
+        return "blogfolha.uol"
     return the_domain

@@ -60,7 +60,7 @@ class SourceService(BaseService):
         """
         a_source = self._session.query(TableSources) \
                                           .filter(TableSources.id == id).first()
-        return a_source.name
+        return a_source.name if a_source else None
 
     def find_source_id_by_url_key(self, url_key):
         """
@@ -68,4 +68,4 @@ class SourceService(BaseService):
         """
         a_source = self._session.query(TableSources) \
                                 .filter(TableSources.url_key == url_key).first()
-        return a_source.id
+        return a_source.id if a_source else None

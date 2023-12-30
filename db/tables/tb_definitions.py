@@ -43,7 +43,8 @@ class TableSources(Base):
     __tablename__ = "tb_sources"
     __table_args__ = (UniqueConstraint('url_key', name="keyulx_1"),)
     id = Column('id', Integer, primary_key=True)
-    name = Column('name', String(100))
+    name = Column('name', String(MAX_ENTITY_NAME_FIELD))
+    # URL key: A subdomain.domain that is used as a key to identifying a source
     url_key = Column('url_key', String(100), nullable=False)
-    home_url = Column('home_url', String(50))
+    home_url = Column('home_url', String(MAX_URL))
     enabled = Column('enabled', Boolean, nullable=False)

@@ -80,7 +80,7 @@ def wrap_as_map(article3k, source_id):
 
             if ("section" in meta_data['article'].keys()):
                 section = meta_data['article']['section']
-                if (len(section) > MAX_SECTION):
+                if (type(section) == str and len(section) > MAX_SECTION):
                     section = section[0:MAX_SECTION]
                     scrapper_logger.warn(f"Truncated section:\t{hashed_url}\t{cleaned_url}")
 
@@ -128,6 +128,7 @@ def wrap_as_map(article3k, source_id):
     article_map['authors'] = authors
     article_map['html'] = article3k.html
 
+    article_map['miner'] = "zmbnews"
     return article_map
 
 def wrap_as_json(article3k, source_id):

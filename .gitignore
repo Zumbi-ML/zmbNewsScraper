@@ -1,3 +1,4 @@
 __pycache__/
 .properties
-*.log
+logs/
+teste*.py
