@@ -1,10 +1,11 @@
 from db_utils import drop_n_create_db
-from source_manager import add_sources
+from managers.source_manager import add_sources
 from scrapper import *
 
 drop_n_create_db()
 # ALTER DATABASE database_name CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 # ALTER TABLE tb_articles CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+# GRANT ALL PRIVILEGES ON zmb_scrapper_db.* TO 'scrapper'@'localhost';
 
 def get_sources():
     return [ \

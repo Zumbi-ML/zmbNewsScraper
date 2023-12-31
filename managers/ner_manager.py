@@ -1,8 +1,8 @@
-from db.tables.max_columns_sizes import *
+from models.max_columns_sizes import *
 from config import scrapper_logger
 import json
-from hasher import hash_url
-from zmbner.spacy import ZmbNER
+from utils.hasher import hash_url
+#from zmbner.spacy import ZmbNER
 
 def wrap_entities(article_map, logger=scrapper_logger):
     """

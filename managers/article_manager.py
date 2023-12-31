@@ -2,13 +2,13 @@
 
 from config import scrapper_logger
 from dotenv import load_dotenv
-from date_formatter import date_format
-from db.article_service import ArticleService
-from db.tables.max_columns_sizes import *
+from utils.date_formatter import date_format
+from services.article_service import ArticleService
+from models.max_columns_sizes import *
 import json
 from newspaper import Article
-import url_manager
-from hasher import hash_url
+import managers.url_manager as url_manager
+from utils.hasher import hash_url
 
 def is_url_in_db(a_url):
     """

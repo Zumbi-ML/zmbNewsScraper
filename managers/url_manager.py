@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 
 from config import scrapper_logger
-from db.url_service import UrlService
-from db.tables.max_columns_sizes import *
+from services.url_service import UrlService
+from models.max_columns_sizes import *
 from dotenv import load_dotenv
 import re
 from zmb_exceptions import ZmbNewsException

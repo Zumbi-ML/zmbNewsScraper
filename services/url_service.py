@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 
-from .base_service import BaseService
+from ..db.base_service import BaseService
 from db.tables.tb_definitions import *
 from datetime import date
-from hasher import hash_url
+from utils.hasher import hash_url
 
 class UrlService(BaseService):
 

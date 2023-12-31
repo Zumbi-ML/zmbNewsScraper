@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
 
-from db.source_service import SourceService
+from services.source_service import SourceService
 from dotenv import load_dotenv
-import url_manager
+import managers.url_manager as url_manager
 
 def add_sources(source_map_lst):
     """

@@ -1,14 +1,14 @@
 # -*- coding: UTF-8 -*-
 
-import article_manager
+import managers.article_manager as article_manager
 import asyncio
 from config import sender_logger
 from dotenv import load_dotenv
 import json
-import ner_manager
+import managers.ner_manager as ner_manager
 from time import sleep
 import requests
-import source_manager
+import managers.source_manager as source_manager
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen

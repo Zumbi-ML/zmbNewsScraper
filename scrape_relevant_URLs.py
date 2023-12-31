@@ -3,7 +3,7 @@
 from scrapper import scrape_url_list_n_save
 from config import RELEVANT_URLs_FILE
 import pandas as pd
-import article_manager
+import managers.article_manager as article_manager
 
 df = pd.read_csv(RELEVANT_URLs_FILE, sep="\t")
 df.columns = ['urls']

@@ -1,16 +1,16 @@
 # -*- coding: UTF-8 -*-
-import article_manager
 from config import scrapper_cfg, scrapper_logger
-import ner_manager
+import managers.article_manager as article_manager
+import managers.source_manager as source_manager
+import managers.url_manager as url_manager
+import managers.ner_manager as ner_manager
 import newspaper
-import source_manager
 from tqdm import tqdm
-import url_manager
-from hasher import hash_url
+from utils.hasher import hash_url
 from zmb_exceptions import ZmbNewsException
-from zmbrelev.classifiers import BernoulliNBClf
+#from zmbrelev.classifiers import BernoulliNBClf
 
-relevance_clf = BernoulliNBClf()
+#relevance_clf = BernoulliNBClf()
 
 def scrape_all_sources_n_save():
     """
@@ -127,7 +127,8 @@ def wrap_source(source_map):
             continue
 
         article_map = wrap_unseen_url(cleaned_url, source_id)
-        if (article_map and is_relevant(article_map)):
+        #if (article_map and is_relevant(article_map)):
+        if (article_map):
             article_map = ner_manager.wrap_entities(article_map)
             article_maps.append(article_map)
     return article_maps

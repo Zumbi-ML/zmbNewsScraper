@@ -1,4 +1,4 @@
-from utils import get_property
+from utils.utils import get_property
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -12,7 +12,7 @@ def get_engine(db_user=DB_USER, db_pwd=DB_PWD, db_host=DB_HOST, db_name=DB_NAME,
     """
     Returns a SQLAlchemy engine for handling the database
     """
-    return create_engine(f"mysql://{db_user}:{db_pwd}@{db_host}/{db_name}", echo=DB_DEBUG_MODE)
+    return create_engine(f"mysql+pymysql://{db_user}:{db_pwd}@{db_host}/{db_name}", echo=DB_DEBUG_MODE)
 
 def get_session():
     """

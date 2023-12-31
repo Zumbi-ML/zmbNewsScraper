@@ -1,9 +1,9 @@
 # -*- coding: UTF-8 -*-
 
-from .base_service import BaseService
-from db.tables.tb_definitions import *
+from services.base_service import BaseService
+from models.entities import ArticleEntity
 from datetime import date
-from hasher import hash_url
+from utils.hasher import hash_url
 
 class ArticleService(BaseService):
     """
@@ -23,7 +23,7 @@ class ArticleService(BaseService):
         """
         hashed_url = hash_url(article_map['url'])
 
-        article = TableArticles( \
+        article = ArticleEntity( \
             source_id = article_map['source_id'],
             hashed_url = hashed_url,
             url = article_map['url'],
@@ -59,16 +59,16 @@ class ArticleService(BaseService):
             a_url: a news article URL
         """
         hashed_url = hash_url(a_url)
-        result = self._session.query(TableArticles) \
-                           .filter(TableArticles.hashed_url == hashed_url).all()
+        result = self._session.query(ArticleEntity) \
+                           .filter(ArticleEntity.hashed_url == hashed_url).all()
         return True if result else False
 
     def read_all_articles_not_sent(self):
         """
         Returns all articles not marked as sent
         """
-        articles = self._session.query(TableArticles) \
-                            .filter(TableArticles.sent == False).all()
+        articles = self._session.query(ArticleEntity) \
+                            .filter(ArticleEntity.sent == False).all()
 
         article_map_lst = []
         for article in articles:
@@ -80,10 +80,10 @@ class ArticleService(BaseService):
         """
         Converts an article returned from DB into a map
         Args:
-            article: TableArticles object
+            article: ArticleEntity object
         """
         article_map = {}
-        #article_map['source_id'] = article.source_id
+        article_map['source_id'] = article.source_id
         article_map['hashed_url'] = article.hashed_url
         article_map['url'] = article.url
         article_map['content'] = article.content
@@ -104,9 +104,22 @@ class ArticleService(BaseService):
         """
         Returns an article by providing its database id
         """
-        article = self._session.query(TableArticles) \
-                                         .filter(TableArticles.id == id).first()
-        return self.convert_db_article_into_map(article)
+        article = self._session.query(ArticleEntity) \
+                                         .filter(ArticleEntity.id == id).first()
+        if (article):
+            return self.convert_db_article_into_map(article)
+        return None
+
+    def find_article_by_url(self, url):
+        """
+        Returns an article by providing its database id
+        """
+        hashed_url = hash_url(url)
+        article = self._session.query(ArticleEntity) \
+                                         .filter(ArticleEntity.hashed_url == hashed_url).first()
+        if (article):
+            return self.convert_db_article_into_map(article)
+        return None
 
     def mark_article_as_sent(self, a_url):
         """
@@ -115,6 +128,38 @@ class ArticleService(BaseService):
             a_url: the URL to be marked as sent
         """
         hashed_url = hash_url(a_url)
-        self._session.query(TableArticles) \
-                                .filter(TableArticles.hashed_url == hashed_url) \
-                                    .update({TableArticles.sent: True})
+        self._session.query(ArticleEntity) \
+                                .filter(ArticleEntity.hashed_url == hashed_url) \
+                                    .update({ArticleEntity.sent: True})
+        
+    def update_article(self, article_id, updated_article_map):
+        """
+        Updates an article in the database
+        Args:
+            article_id: the ID of the article to be updated
+            updated_article_map: a dictionary with the updated article data
+        """
+        article = self._session.query(ArticleEntity).filter(ArticleEntity.id == article_id).first()
+        if article:
+            for key, value in updated_article_map.items():
+                setattr(article, key, value)
+            self._session.commit()
+        else:
+            # Handle the case where the article does not exist
+            pass
+
+    def delete_article(self, article_id):
+        """
+        Deletes an article from the database
+        Args:
+            article_id: the ID of the article to be deleted
+        """
+        article = self._session.query(ArticleEntity).filter(ArticleEntity.id == article_id).first()
+        if article:
+            self._session.delete(article)
+            self._session.commit()
+        else:
+            # Handle the case where the article does not exist
+            pass
+
+
